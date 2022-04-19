@@ -55,7 +55,7 @@ foreach my $fn (</usr/share/pdk/sky130A/libs.tech/xschem/sky130*/*.sym>)
      #if(m/^B (\d+) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{(.*)\}/) # Rectangle
     if(m/^B (\d+) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{(name=?\w*) (dir=?\w*) (.*)/) # Rectangle
     { 
-      my($num,$x1,$y1,$l,$y2,$name,$data)=($1,int($2*10),int($3*10+23),int($1*10),int($5*-10),$6,$7);
+      my($num,$x1,$y1,$l,$y2,$name,$data)=($1,int($2*10),int($3*-10+23),int($1*10),int($5*-10),$6,$7);
       $name =~ s/name=//;
 
 
@@ -115,7 +115,12 @@ foreach my $fn (</usr/share/pdk/sky130A/libs.tech/xschem/sky130*/*.sym>)
       my($lay,$np,$points,$param)=($1,$2,$3,$4);
       my @points=split(" ",$points);
       print FH "P $np 0 0 1 ";
-      print FH int($_*10)." " foreach(@points);
+      my $dir=1;
+      foreach(@points)
+      {
+        print FH int($_*10*$dir)." ";
+        $dir=-$dir;
+      }
       print FH "".(($param=~m/fill=true/)?"F":"N")."\n";
     }
 
