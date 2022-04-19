@@ -53,22 +53,21 @@ foreach my $fn (</usr/share/pdk/sky130A/libs.tech/xschem/sky130*/*.sym>)
       $nT++;
     }
      #if(m/^B (\d+) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{(.*)\}/) # Rectangle
-    if(m/^B (\d+) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{(name=?\w*) (dir=?\w*) (.*)/) # Rectangle
+    if(m/^B (\d+) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{(name=?\w*) (dir=?\w*)/) # Rectangle
     { 
-      my($num,$x1,$y1,$l,$y2,$name,$data)=($1,int($2*10),int($3*-10-23),int($1*10),int($5*-10),$6,$7);
+      my($num,$x1,$y1,$name,$data)=($1,int($2/5)*50,int($3/5)*50,$6,$7);
       $name =~ s/name=//;
 
-
-      if($data eq "dir=in"){
-        $x1=$x1-80;
+      if(index($data, "dir=in") != -1){
+        $x1=$x1-100;
         print FH "X $name $count $x1 $y1 100 R  50 43 1 1 I\n";
       }
-      elsif($data eq "dir=inout"){
-        $x1=$x1+80;
+      elsif(index($data, "dir=inout") != -1){
+        $x1=$x1+100;
       print FH "X $name $count $x1 $y1 100 R 50 43 1 1 B\n";
       }
       else
-      { $x1=$x1+80;
+      { $x1=$x1+100;
         print FH "X $name $count $x1 $y1 100 L 50 43 1 1 O\n";
       }
       $count++;
