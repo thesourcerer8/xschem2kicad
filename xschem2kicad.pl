@@ -55,7 +55,7 @@ foreach my $fn (</usr/share/pdk/sky130A/libs.tech/xschem/sky130*/*.sym>)
      #if(m/^B (\d+) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{(.*)\}/) # Rectangle
     if(m/^B (\d+) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{(name=?\w*) (dir=?\w*) (.*)/) # Rectangle
     { 
-      my($num,$x1,$y1,$l,$y2,$name,$data)=($1,int($2*10),int($3*-10+23),int($1*10),int($5*-10),$6,$7);
+      my($num,$x1,$y1,$l,$y2,$name,$data)=($1,int($2*10),int($3*-10-23),int($1*10),int($5*-10),$6,$7);
       $name =~ s/name=//;
 
 
