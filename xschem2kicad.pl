@@ -1,4 +1,5 @@
 #!/usr/bin/perl -w
+use strict;
 
 my $filename = 'sky130.lib';
 open(FH, '>', $filename) or die $!;
@@ -37,7 +38,7 @@ foreach my $fn (</usr/share/pdk/sky130A/libs.tech/xschem/sky130*/*.sym>)
   print FH "DRAW\n";
   open IN,"<$fn";
   my $nT=1;
-  $count=1;
+  my $count=1;
   while(<IN>)
   { 
     if(m/^T \{([^\}]*)\} (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{([\^}]*)\}/) # Text
@@ -86,27 +87,26 @@ foreach my $fn (</usr/share/pdk/sky130A/libs.tech/xschem/sky130*/*.sym>)
       {
         my $s1=int($sa+(3600-$sa)/3);
         my $s2=int($sa+(3600-$sa)*2/3);	
-        print FH "A $x1 $y1 $rad $sa $s1 0 0 1 N $x1 $y1 $x1 $y1\n";
-        print FH "A $x1 $y1 $rad $s1 $s2 0 0 1 N $x1 $y1 $x1 $y1\n";
-        print FH "A $x1 $y1 $rad $s2 3600 0 0 1 N $x1 $y1 $x1 $y1\n";
+        print FH "A $x1 $y1 $rad $sa $s1 0 0 1 N\n";
+        print FH "A $x1 $y1 $rad $s1 $s2 0 0 1 N\n";
+        print FH "A $x1 $y1 $rad $s2 3600 0 0 1 N\n";
         my $s3=int(0+($ea-3600)/3);
         my $s4=int(0+($ea-3600)*2/3);	
-        print FH "A $x1 $y1 $rad 0 $s3 0 0 1 N $x1 $y1 $x1 $y1\n";
-        print FH "A $x1 $y1 $rad $s3 $s4 0 0 1 N $x1 $y1 $x1 $y1\n";
-        print FH "A $x1 $y1 $rad $s4 ".($ea-3600)." 0 0 1 N $x1 $y1 $x1 $y1\n";
+        print FH "A $x1 $y1 $rad 0 $s3 0 0 1 N\n";
+        print FH "A $x1 $y1 $rad $s3 $s4 0 0 1 N\n";
+        print FH "A $x1 $y1 $rad $s4 ".($ea-3600)." 0 0 1 N\n";
       }
       elsif($pa<1800) # KiCad can draw it in one go
       {      
-        print FH "A $x1 $y1 $rad $sa $ea 0 0 1 N $x1 $y1 $x1 $y1\n";
+        print FH "A $x1 $y1 $rad $sa $ea 0 0 1 N\n";
       }
       else # We have to split it up in 3 segments for KiCad
       {
         my $s1=int($sa+$pa/3);
         my $s2=int($sa+$pa*2/3);	
-        print FH "A $x1 $y1 $rad $sa $s1 0 0 1 N $x1 $y1 $x1 $y1\n";
-        print FH "A $x1 $y1 $rad $s1 $s2 0 0 1 N $x1 $y1 $x1 $y1\n";
-        print FH "A $x1 $y1 $rad $s2 $ea 0 0 1 N $x1 $y1 $x1 $y1\n";
-
+        print FH "A $x1 $y1 $rad $sa $s1 0 0 1 N\n";
+        print FH "A $x1 $y1 $rad $s1 $s2 0 0 1 N\n";
+        print FH "A $x1 $y1 $rad $s2 $ea 0 0 1 N\n";
       }
     }
     if(m/^P (\d+) (\d+) (.*?) \{(.*)\}/) # P Polygon
