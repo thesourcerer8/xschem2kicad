@@ -27,8 +27,9 @@ foreach my $fn (</usr/share/pdk/sky130A/libs.tech/xschem/sky130*/*.sym>)
   print FH "DRAW\n";
   open IN,"<$fn";
   my $nT=1;
+  $count=1;
   while(<IN>)
-  {
+  { 
     if(m/^T \{([^\}]*)\} (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{([\^}]*)\}/) # Text
     {
       my ($text,$x1,$y1,$rot,$mirr)=($1,int($2*10),int($3*-10),int($4*10),int($5*10));
@@ -40,10 +41,27 @@ foreach my $fn (</usr/share/pdk/sky130A/libs.tech/xschem/sky130*/*.sym>)
             #T 0 0   150 50 0 0 0 2x    Normal 0 C C
       $nT++;
     }
-    if(m/^B (\d+) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{(.*)\}/) # Rectangle
-    {
-      my($num,$x1,$y1,$x2,$y2,$data)=($1,int($2*10),int($3*-10),int($4*10),int($5*-10),$6);
-      print FH "S $x1 $y1 $x2 $y2 0 1 1 F\n";
+     #if(m/^B (\d+) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{(.*)\}/) # Rectangle
+    if(m/^B (\d+) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{(name=?\w*) (dir=?\w*) (.*)/) # Rectangle
+    { 
+      my($num,$x1,$y1,$l,$y2,$name,$data)=($1,int($2*10),int($3*10+23),int($1*10),int($5*-10),$6,$7);
+      $name =~ s/name=//;
+
+
+      if($data eq "dir=in"){
+        $x1=$x1-80;
+        print FH "X $name $count $x1 $y1 100 R  50 43 1 1 I\n";
+      }
+      elsif($data eq "dir=inout"){
+        $x1=$x1+80;
+      print FH "X $name $count $x1 $y1 100 R 50 43 1 1 B\n";
+      }
+      else
+      { $x1=$x1+80;
+        print FH "X $name $count $x1 $y1 100 L 50 43 1 1 O\n";
+      }
+      $count++;
+      
     }
     if(m/^L (\d+) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{(.*)\}/) # L Line
     {
