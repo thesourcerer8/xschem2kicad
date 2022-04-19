@@ -25,6 +25,7 @@ foreach my $fn (</usr/share/pdk/sky130A/libs.tech/xschem/sky130*/*.sym>)
   print FH "F2 \"\" 0 -1500 50 H I C CNN\n";
   print FH "F3 \"\" 0 0 50 H I C CNN\n";
   print FH "DRAW\n";
+  $defaultpinnumber = 1; # Pin number for components as not all components have pin numbers
   open IN,"<$fn";
   my $nT=1;
   while(<IN>)
@@ -42,13 +43,32 @@ foreach my $fn (</usr/share/pdk/sky130A/libs.tech/xschem/sky130*/*.sym>)
     }
     if(m/^B (\d+) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{(.*)\}/) # Rectangle
     {
-      my($num,$x1,$y1,$x2,$y2,$data)=($1,int($2*10),int($3*-10),int($4*10),int($5*-10),$6);
-      print FH "S $x1 $y1 $x2 $y2 0 1 1 F\n";
+      my ($data)=($6);
+      my @pairs = split(/\s+/,$data);
+      my %hash = map { split(/=/, $_, 2) } @pairs;
+      $xname="~";
+      $xdir="U";
+      $xpinnumber="";
+      $xgoto="";
+      $xpropag="";
+      $xorientation="";
+      if ($hash{name}) { $xname=$hash{name}; }       
+      if ($hash{dir}) { 
+        if ($hash{dir} eq "in") { $xdir="I"; $xorientation="R"; }
+        if ($hash{dir} eq "out") { $xdir="O", $xorientation="L"; }
+      }       
+      if ($hash{goto}) { $xgoto=($hash{goto}); }       
+      if ($hash{propag}) { $xpropag=($hash{propag}); }       
+      if ($hash{pinnumber}) { $xpinnumber=($hash{pinnumber}); }       
+      my ($x,$y)=(int((($2+$4)/2)*10),int((($3+$5)/2)*10),$6);
+      # X name num x y length UDRL sizeNum sizeName unit convert Etype shape
+      print FH "X $xname $defaultpinnumber $x $y 10 $xorientation 40 40 0 0 $xdir \n";
+      $defaultpinnumber++;
     }
     if(m/^L (\d+) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{(.*)\}/) # L Line
     {
       my($num,$x1,$y1,$x2,$y2,$data)=($1,int($2*10),int($3*-10),int($4*10),int($5*-10),$6);
-      print FH "P 2 0 0 1 $x1 $y1 $x2 $y2 N\n";
+      print FH "P 2 0 0 5 $x1 $y1 $x2 $y2 N\n";
     }
     if(m/^A (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) (-?\d+\.?\d*) \{(.*)\}/) # A Arc
     {
